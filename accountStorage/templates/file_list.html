@@ -6,7 +6,7 @@
 </head>
 <body>
 <h3>File List</h3>
-<p> <a href="/file/upload1/">RegularFormUpload</a> | <a href="/file/upload2/">ModelFormUpload</a>
+<p> <a href="/account/file/upload1/">RegularFormUpload</a> | <a href="/account/file/upload2/">ModelFormUpload</a>
     | <a href="/file/upload3/">AjaxUpload</a></p>
 {% if files %}
 <table class="table table-striped">
@@ -29,7 +29,7 @@
 
 {% else %}
 
-<p>No files uploaded yet. Please click <a href="{% url 'file_upload' %}">here</a>
+<p>No files uploaded yet. Please click <a href="/file/upload1/">here</a>
     to upload files.</p>
 {% endif %}
 </body>

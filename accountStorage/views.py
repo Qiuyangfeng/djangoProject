@@ -1,13 +1,14 @@
-from django.shortcuts import render, HttpResponse, redirect
-from .models import AccountPassword
+import os
+import uuid
+
 from django.core.paginator import Paginator
-from accountStorage.untils.modelform import UserModelForm
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+
+from .forms import FileUploadForm, FileUploadModelForm, UserModelForm
+from .models import AccountPassword
 from .models import File
-from .forms import FileUploadForm, FileUploadModelForm
-import os, uuid
-from django.template.defaultfilters import filesizeformat
 
 
 def account_list(request):
@@ -121,7 +122,7 @@ def file_upload(request):
             new_file.file = handle_uploaded_file(raw_file)
             new_file.upload_method = upload_method
             new_file.save()
-            return redirect("/file/")
+            return redirect("/account/file/")
     else:
         form = FileUploadForm()
     return render(request, 'upload_form.html', {'form': form, 'heading': 'Upload files with Regular Form'})
@@ -132,10 +133,18 @@ def model_form_upload(request):
         form = FileUploadModelForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # 一句话足以
-            return redirect("/file/")
+            return redirect("/account/file/")
     else:
         form = FileUploadModelForm()
 
     return render(request, 'upload_form.html',
                   {'form': form, 'heading': 'Upload files with ModelForm'}
                   )
+
+def upload_excel(request):
+    """上传excel，读取数据写入数据库"""
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+    else:
+        form = FileUploadForm()
+    return render(request, 'upload_excel.html', {'form': form, 'heading': 'Upload files with Regular Form'})

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/css/bootstrap.min.css' %}">
     <style>
         .navbar {
             border-radius: 0;
@@ -32,7 +32,7 @@
                 <li><a href="/account/">账号管理</a></li>
             </ul>
             <ul class="nav navbar-nav">
-                <li><a href="/account/upload">上传文件</a></li>
+                <li><a href="/account/file/">上传文件</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -53,9 +53,9 @@
 <div class="container">
 {% block content %}{% endblock %}
 </div>
-<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
-<script src="{% static 'plugins/bootstrap-3.4.1-dist/js/bootstrap.js' %}"></script>
-<script src="{% static 'plugins/bootstrap-3.4.1-dist/js/WdatePicker.js' %}"></script>
+<script src="{% static 'accountStorage/js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/js/bootstrap.js' %}"></script>
+<script src="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/js/WdatePicker.js' %}"></script>
 {% block js %}{% endblock %}
 </body>
 </html>

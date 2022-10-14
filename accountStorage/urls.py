@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from django.conf import settings
-from django.conf.urls.static import static
 from accountStorage import views
 
+app_name = 'accountStorage'
 urlpatterns = [
     path('admin/', admin.site.urls),
     # 账号密码
@@ -29,6 +28,7 @@ urlpatterns = [
     path('delete/', views.account_delete),
     # 上传列表
     path('file/', views.file_list, name='file_list'),
+    path('excel/', views.upload_excel, name='upload_excel'),
     re_path(r'^file/upload1/$', views.file_upload, name='file_upload'),
     re_path(r'^file/upload2/$', views.model_form_upload, name='model_form_upload'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
