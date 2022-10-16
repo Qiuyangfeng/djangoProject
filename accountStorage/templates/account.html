@@ -1,19 +1,19 @@
 {% extends 'layout.html' %}
 {% block content %}
     <button id="btnAdd" type="button" class="btn btn-success">新建账号</button>
-    <button href="/account/excel/" type="button" class="btn btn-success">上传模板</button>
-            <div style="float: right;width: 300px">
-            <form method="get">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索" name="search" value="{{ search_data }}"/>
-                    <span class="input-group-btn">
+    <a class="btn btn-success" href="/account/file/excel/">上传xlsx</a>
+    <div style="float: right;width: 300px">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="搜索" name="search" value="{{ search_data }}"/>
+                <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                 </button>
                 </span>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
+    </div>
     <div class="bs-example" data-example-id="hoverable-table">
         <table class="table table-hover">
             <thead>
@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
-        <!-- 删除订单Modal -->
+    <!-- 删除订单Modal -->
     <div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="alert alert-danger alert-dismissible fade in" role="alert">
@@ -85,10 +85,10 @@
             </div>
         </div>
     </div>
-<div class="pagination">
+    <div class="pagination">
     <span class="step-links">
     <nav aria-label="Page navigation">
-    <ul class="pagination" >
+    <ul class="pagination">
     <li>
         {% if page_obj.has_previous %}
             <a href="?page=1&search={{ search_data }}">&laquo; 首页</a>
@@ -107,7 +107,7 @@
     </ul>
     </nav>
     </span>
-</div>
+    </div>
 {% endblock %}
 {% block js %}
     <script type="text/javascript">
@@ -133,6 +133,7 @@
                 $('#modalAddEdit').modal('show');
             });
         }
+
         function bindBtnEditEvent() {
             $(".btn-edit").click(function () {
                 //清空对话框内容
@@ -165,6 +166,7 @@
                 })
             })
         }
+
         function bindBtnSaveEvent() {
             $("#btnSave").click(function () {
                 //清除错误信息
@@ -178,6 +180,7 @@
                 }
             });
         }
+
         function doAdd() {
             //点击保存按钮，发生请求
             $.ajax({
@@ -203,6 +206,7 @@
                 }
             })
         }
+
         function doEdit() {
             //点击保存按钮，发生请求  /order/edit/?uid=123
             $.ajax({
@@ -232,6 +236,7 @@
                 }
             })
         }
+
         function bindBtnDeleteEvent() {
             $(".btn-delete").click(function () {
                 //点击删除按钮，显示对话框
@@ -240,6 +245,7 @@
                 //console.log(DELETE_ID);
             });
         }
+
         function bindBtnConfirmDeleteEvent() {
             $("#btnConfirmDelete").click(function () {
                 //点击确定删除按钮，发送ajax请求删除数据

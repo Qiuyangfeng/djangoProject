@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <button id="btnUpload" type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">
+        上传模板
+    </button>
+    <!-- 上传Small modal -->
+    <div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form id="formExcel" action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <p>
+                        <label for="id_file">文件:</label>
+                        <input type="file" name="file" class="form-control" required="" id="id_file">
+                    </p>
+                    <button id="btnUploadExcel" class="btn btn-info form-control" type="submit" value="submit">上传
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            bindBtnUploadEvent();
+            bindBtnUploadExcelEvent();
+        })
+
+        function bindBtnUploadEvent() {
+            $('#btnUpload').click(function () {
+                //点击新建按钮，显示对话框
+                $('#modalUpload').modal('show');
+            })
+        }
+
+        function bindBtnUploadExcelEvent() {
+            $("#btnUploadExcel").click(function () {
+                let formData = new FormData($("#formExcel"));
+                $.ajax({
+                    url: "file/ajax/",
+                    type: "post",
+                    data: formData,
+                    success: function (res) {
+                        if (res.status) {
+                            //alert("创建成功");
+                            //清空表单 $("#formAdd")是jQuery对象 -> $("#formAdd")[0] DOM对象
+                            //$("#formAdd")[0].reset();
+                            //隐藏对话框
+                            //$('#myModal').modal('hide');
+                            //刷新页面
+                            location.reload();
+                        } else {
+                            // 把错误信息显示在对话框中
+                            $.each(res.error, function (name, errorList) {
+                                $("#id_" + name).next().text(errorList[0]);
+                            })
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}
