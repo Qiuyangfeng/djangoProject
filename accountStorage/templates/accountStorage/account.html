@@ -1,7 +1,7 @@
-{% extends 'layout.html' %}
+{% extends 'accountStorage/layout.html' %}
 {% block content %}
     <button id="btnAdd" type="button" class="btn btn-success">新建账号</button>
-    <a class="btn btn-success" href="/account/file/excel/">上传xlsx</a>
+    <a class="btn btn-success" href="{% url 'accountStorage:upload_excel' %}">上传xlsx</a>
     <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">上传模板</button>
     <div style="float: right;width: 300px">
         <form method="get">
