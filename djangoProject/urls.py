@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('polls/', include('polls.urls')),
     path('account/', include('accountStorage.urls')),
+    path('file/', include('fileStorage.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

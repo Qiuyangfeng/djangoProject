@@ -11,23 +11,23 @@ from .forms import FileUploadForm, FileUploadModelForm, UserModelForm
 from .models import AccountPassword
 from .models import File
 
-
-def account_list (request):
-    for i in range(20):
-        account = {
-            "name": "测试账号{}".format(i),
-            "username": "test{}".format(i),
-            "password": "123456".format(i),
-            "note": "测试备注{}".format(i)
-        }
-        #     AccountPassword.objects.create(**account)
-        # AccountPassword.objects.filter(username="test{}".format(i)).delete()
+def account_list(request):
+    """用户列表"""
+    # for i in range(20):
+    #     account = {
+    #         "name": "测试账号{}".format(i),
+    #         "username": "test{}".format(i),
+    #         "password": "123456".format(i),
+    #         "note": "测试备注{}".format(i)
+    #     }
+    #     AccountPassword.objects.create(**account)
+    #     AccountPassword.objects.filter(username="test{}".format(i)).delete()
     data = {}
     search_data = request.GET.get('search', "")
     if search_data:
         data["username__contains"] = search_data
     form = UserModelForm()
-    data_list = AccountPassword.objects.filter(**data)
+    data_list = AccountPassword.objects.filter(**data).order_by("-id")
     paginator = Paginator(data_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -45,7 +45,7 @@ def account_list (request):
 
 
 @csrf_exempt
-def account_add (request):
+def account_add(request):
     """添加用户 (ajax请求)"""
     form = UserModelForm(data=request.POST)
     if form.is_valid():
@@ -57,7 +57,7 @@ def account_add (request):
     return JsonResponse({'status': False, 'error': form.errors})
 
 
-def account_detail (request):
+def account_detail(request):
     """获取账号详情"""
     uid = request.GET.get("uid")
     row_dict = AccountPassword.objects.filter(id=uid).values("name", "username", "password", "note").first()
@@ -68,7 +68,7 @@ def account_detail (request):
 
 
 @csrf_exempt
-def account_edit (request):
+def account_edit(request):
     """账号编辑"""
     uid = request.GET.get("uid")
     row_object = AccountPassword.objects.filter(id=uid).first()
@@ -81,7 +81,7 @@ def account_edit (request):
     return JsonResponse({"status": False, 'error': form.errors})
 
 
-def account_delete (request):
+def account_delete(request):
     """账号删除"""
     uid = request.GET.get('uid')
     exists = AccountPassword.objects.filter(id=uid).exists()
@@ -91,13 +91,13 @@ def account_delete (request):
     return JsonResponse({"status": True, 'msg': "删除成功"})
 
 
-def file_list (request):
+def file_list(request):
     """文件列表"""
     files = File.objects.all().order_by('-id')
     return render(request, 'file_list.html', {'files': files})
 
 
-def handle_uploaded_file (file):
+def handle_uploaded_file(file):
     ext = file.name.split(',')[-1]
     file_name = "{}.{}".format(uuid.uuid4().hex[:10], ext)
     file_path = os.path.join('media', 'files', file_name)
@@ -113,7 +113,7 @@ def handle_uploaded_file (file):
     return file_path
 
 
-def file_upload (request):
+def file_upload(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -129,7 +129,7 @@ def file_upload (request):
     return render(request, 'upload_form.html', {'form': form, 'heading': 'Upload files with Regular Form'})
 
 
-def model_form_upload (request):
+def model_form_upload(request):
     if request.method == "POST":
         form = FileUploadModelForm(request.POST, request.FILES)
         if form.is_valid():
@@ -143,7 +143,7 @@ def model_form_upload (request):
                   )
 
 
-def upload_excel (request):
+def upload_excel(request):
     """上传excel，读取数据写入数据库"""
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -165,6 +165,15 @@ def upload_excel (request):
 
 
 @csrf_exempt
-def upload_ajax_excel (request):
+def upload_ajax_excel(request):
     """ajax上传excel，读取数据写入数据库"""
+    if request.method == 'POST':
+        file_object = request.FILES.get('files')
+        df = pd.read_excel(file_object, keep_default_na=False)
+        print(df)
+        for i in df.index.values:
+            df_dict = df.loc[i, ["name", "username", "password", "note"]].to_dict()
+            print(df_dict)
+            AccountPassword.objects.create(**df_dict)
+        return redirect("/account/")
     return render(request, 'ajax_upload.html')

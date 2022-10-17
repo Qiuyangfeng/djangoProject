@@ -2,6 +2,7 @@
 {% block content %}
     <button id="btnAdd" type="button" class="btn btn-success">新建账号</button>
     <a class="btn btn-success" href="/account/file/excel/">上传xlsx</a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">上传模板</button>
     <div style="float: right;width: 300px">
         <form method="get">
             <div class="input-group">
@@ -19,7 +20,9 @@
             <thead>
             <tr>
                 {% for key in key_list %}
-                    <th>{{ key }}</th>
+                    {% if key != 'id' %}
+                        <th>{{ key }}</th>
+                    {% endif %}
                 {% endfor %}
                 <th>操作</th>
             </tr>
@@ -27,7 +30,6 @@
             <tbody>
             {% for data in page_obj %}
                 <tr>
-                    <td>{{ data.id }}</td>
                     <td>{{ data.name }}</td>
                     <td>{{ data.username }}</td>
                     <td>******</td>
@@ -82,6 +84,19 @@
                     <button id="btnConfirmDelete" type="button" class="btn btn-danger">确定</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </p>
+            </div>
+        </div>
+    </div>
+    <!-- 上传Small modal -->
+    <div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <p>
+                    <input type="file" class="form-control" name="upload" id="file_uploads" required/>
+                </p>
+                <button id="btnUploadExcel" class="btn btn-info form-control" type="submit" onclick="uploads()"
+                        value="submit">上传
+                </button>
             </div>
         </div>
     </div>
@@ -275,6 +290,25 @@
                     }
                 })
             });
+        }
+
+        function UploadEvent() {
+            $('#modalUpload').modal('show');
+        }
+
+        function uploads() {
+            const form_data = new FormData();
+            form_data.append('files', $('#file_uploads')[0].files[0]);
+            $.ajax({
+                type: 'post',
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function (callback) {
+                    alert('上传完成!')
+                    location.reload();
+                }
+            })
         }
 
     </script>
