@@ -15,5 +15,5 @@ class File(models.Model):
     name = models.CharField(max_length=20, verbose_name="自定义名")
     file = models.FileField(upload_to="media/%Y-%M-%D", null=True, verbose_name="文件路径")
     # file = models.FileField(upload_to=user_directory_path, null=True, verbose_name="文件路径")
-    annotation = models.CharField(max_length=20, verbose_name="备注")
+    annotation = models.CharField(max_length=20, verbose_name="备注", null=True)
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="上传时间")

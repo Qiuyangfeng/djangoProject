@@ -41,7 +41,7 @@ def file_upload(request):
             return redirect("/file/")
     else:
         form = FileUploadForm()
-    return render(request, 'upload_form.html', {'form': form, 'heading': 'Upload files with Regular Form'})
+    return render(request, 'fileStorage/upload_form.html', {'form': form, 'heading': 'Upload files with Regular Form'})
 
 
 def model_form_upload(request):
@@ -49,10 +49,10 @@ def model_form_upload(request):
         form = FileUploadModelForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # 一句话足以
-            return redirect("/account/file/")
+            return redirect("/file/")
     else:
         form = FileUploadModelForm()
 
-    return render(request, 'upload_form.html',
+    return render(request, 'fileStorage/upload_form.html',
                   {'form': form, 'heading': 'Upload files with ModelForm'}
                   )

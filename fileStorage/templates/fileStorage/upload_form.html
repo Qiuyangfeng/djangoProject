@@ -1,0 +1,8 @@
+{% extends 'fileStorage/layout.html' %}
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data" >
+  {% csrf_token %}
+  {{ form.as_p }}
+ <button class="btn btn-info form-control " type="submit" value="submit">Upload</button>
+</form>
+{% endblock %}
