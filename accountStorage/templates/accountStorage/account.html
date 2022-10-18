@@ -1,8 +1,7 @@
 {% extends 'accountStorage/layout.html' %}
 {% block content %}
     <button id="btnAdd" type="button" class="btn btn-success">新建账号</button>
-    <a class="btn btn-success" href="{% url 'accountStorage:upload_excel' %}">上传xlsx</a>
-    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">上传模板</button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">模板上传</button>
     <div style="float: right;width: 300px">
         <form method="get">
             <div class="input-group">
@@ -20,7 +19,9 @@
             <thead>
             <tr>
                 {% for key in key_list %}
-                    {% if key != 'id' %}
+                    {% if key == 'password' %}
+                        <th>{{ key }}(点击复制)</th>
+                    {% elif key != 'id' %}
                         <th>{{ key }}</th>
                     {% endif %}
                 {% endfor %}
@@ -32,7 +33,7 @@
                 <tr>
                     <td>{{ data.name }}</td>
                     <td>{{ data.username }}</td>
-                    <td>******</td>
+                    <td><a onclick="myFun(this)">{{ data.password | pluralize:"******" }}</a></td>
                     <td>{{ data.note }}</td>
                     <td>
                         <a uid="{{ data.id }}" class="btn btn-primary btn-xs btn-edit">编辑</a>
@@ -92,10 +93,10 @@
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <p>
+                    <a href="{{ excel_url }}">模板下载</a>
                     <input type="file" class="form-control" name="upload" id="file_uploads" required/>
                 </p>
-                <button id="btnUploadExcel" class="btn btn-info form-control" type="submit" onclick="uploads()"
-                        value="submit">上传
+                <button class="btn btn-info form-control" type="submit" onclick="uploads()" value="submit">上传
                 </button>
             </div>
         </div>
@@ -310,6 +311,27 @@
                 }
             })
         }
+
+        function selectText(element) {
+            return element.innerText;
+        }
+
+        function copyText(text) {
+            const textareaC = document.createElement('textarea');
+            textareaC.setAttribute('readonly', 'readonly'); //设置只读属性防止手机上弹出软键盘
+            textareaC.value = text;
+            document.body.appendChild(textareaC); //将textarea添加为body子元素
+            textareaC.select();
+            const res = document.execCommand('copy');
+            document.body.removeChild(textareaC);//移除DOM元素
+            console.log("复制成功");
+            return res;
+        }
+
+        function myFun(e) {
+            copyText(selectText(e));
+        }
+
 
     </script>
 {% endblock %}

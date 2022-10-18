@@ -37,7 +37,8 @@ def account_list (request):
         "key_list": keys_list,
         "data_list": data_list,
         "page_obj": page_obj,
-        "form": form
+        "form": form,
+        "excel_url": "/media/excel/account.xlsx",
     }
     return render(request, 'accountStorage/account.html', context)
 

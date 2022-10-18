@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import FileUploadForm, FileUploadModelForm
 from .models import File
 
+
 def file_list(request):
     """文件列表"""
     files = File.objects.all().order_by('-id')
@@ -29,6 +30,7 @@ def handle_uploaded_file(file):
 
 
 def file_upload(request):
+    """使用from上传"""
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -47,6 +49,7 @@ def file_upload(request):
 
 
 def model_form_upload(request):
+    """使用modelfrom上传"""
     if request.method == "POST":
         form = FileUploadModelForm(request.POST, request.FILES)
         if form.is_valid():
@@ -58,3 +61,19 @@ def model_form_upload(request):
     return render(request, 'fileStorage/upload_form.html',
                   {'form': form, 'heading': 'Upload files with ModelForm'}
                   )
+
+
+@csrf_exempt
+def ajax_upload(request):
+    """ajax上传文件，路径写入数据库"""
+    if request.method == "POST":
+        file_name = request.POST.get('name')
+        file_object = request.FILES.get('files')
+        file_annotation = request.POST.get('annotation')
+        print(file_name, file_object, file_annotation)
+        new_file = File()
+        new_file.file = file_object
+        new_file.name = file_name
+        new_file.annotation = file_annotation
+        new_file.save()
+        return redirect("/file/")

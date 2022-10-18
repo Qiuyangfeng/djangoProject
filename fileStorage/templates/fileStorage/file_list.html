@@ -1,30 +1,74 @@
 {% extends 'fileStorage/layout.html' %}
 {% block content %}
-<h3>三种方式</h3>
-<p> <a href="{% url 'fileStorage:form_upload' %}"> From上传 </a> | <a href="{% url 'fileStorage:model_form_upload' %}"> ModelForm上传 </a>
-    | <a href="/file/upload3/"> Ajax上传 </a></p>
-{% if files %}
-<table class="table table-striped">
-    <tbody>
-    <tr>
-        <td>Filename & URL</td>
-        <td>Filesize</td>
-        <td>Upload Method</td>
-    </tr>
-    {% for file in files %}
-    <tr>
-        <img src="{{ file.file.url }}" width="980" height = "180"/>
-        <td>{{ file.name }}</td>
-        <td><a href="{{ file.file.url }}">{{ file.file.url }}</a></td>
-        <td>{{ file.file.size | filesizeformat }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <h3>三种方式</h3>
+    <p><a href="{% url 'fileStorage:form_upload' %}"> From上传 </a> | <a href="{% url 'fileStorage:model_form_upload' %}">
+        ModelForm上传 </a>
+        | <a onclick="UploadEvent()"> Ajax上传 </a></p>
+    {% if files %}
+        <table class="table table-striped">
+            <tbody>
+            <tr>
+                <td>Filename & URL</td>
+                <td>Filesize</td>
+                <td>Upload Method</td>
+            </tr>
+            {% for file in files %}
+                <tr>
+                    <img src="{{ file.file.url }}" width="980" height="180"/>
+                    <td>{{ file.name }}</td>
+                    <td><a href="{{ file.file.url }}">{{ file.file.url }}</a></td>
+                    <td>{{ file.file.size | filesizeformat }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-{% else %}
+    {% else %}
 
-<p>No files uploaded yet. Please click <a href="{% url 'fileStorage:form_upload' %}">here</a>
-    to upload files.</p>
-{% endif %}
+        <p>No files uploaded yet. Please click <a href="{% url 'fileStorage:form_upload' %}">here</a>
+            to upload files.</p>
+    {% endif %}
+    <!-- 上传Small modal -->
+    <div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <p>
+                    <label for="file_name">名称:</label><input type="text" class="form-control" name="file_name"
+                                                             id="file_name" value="" required/>
+                    <input type="file" class="form-control" name="upload" id="file_uploads" required/>
+                    <label for="file_annotation">备注:</label><input type="text" class="form-control"
+                                                                   name="file_annotation" id="file_annotation" value=""
+                                                                   required/>
+                </p>
+                <button id="btnUploadExcel" class="btn btn-info form-control" type="submit" onclick="uploads()"
+                        value="submit">上传
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function UploadEvent() {
+            $('#modalUpload').modal('show');
+        }
+
+        function uploads() {
+            const form_data = new FormData();
+            form_data.append('name', $('#file_name').val());
+            form_data.append('files', $('#file_uploads')[0].files[0]);
+            form_data.append('annotation', $('#file_annotation').val());
+            $.ajax({
+                url: "{% url 'fileStorage:ajax_upload' %}",
+                type: 'post',
+                contentType: false,
+                processData: false,
+                data: form_data,
+                success: function (callback) {
+                    alert('上传完成!')
+                    location.reload();
+                }
+            })
+        }
+    </script>
 {% endblock %}
