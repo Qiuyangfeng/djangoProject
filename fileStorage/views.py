@@ -32,11 +32,13 @@ def file_upload(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            upload_method = form.cleaned_data.get("upload_method")
+            name = form.cleaned_data.get("name")
+            annotation = form.cleaned_data.get("annotation")
             raw_file = form.cleaned_data.get('file')
             new_file = File()
             new_file.file = handle_uploaded_file(raw_file)
-            new_file.upload_method = upload_method
+            new_file.name = name
+            new_file.annotation = annotation
             new_file.save()
             return redirect("/file/")
     else:
