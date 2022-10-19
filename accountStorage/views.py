@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import UserModelForm
 from .models import AccountPassword
 
+def login(request):
+    pass
+    return render(request, 'accountStorage/login.html')
 
 def account_list (request):
     """用户列表"""

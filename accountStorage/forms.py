@@ -1,6 +1,8 @@
 from django import forms
 from .models import AccountPassword
 
+
+
 class Bootstrap():
     # password = forms.CharField(min_length=6, label="密码")
     def __init__ (self, *args, **kwargs):
@@ -23,3 +25,20 @@ class UserModelForm(BootstrapModelForm):
     class Meta:
         model = AccountPassword
         fields = ["name", "username", "password", "note"]
+
+class LoginForm(BootstrapForm):
+    username = forms.CharField(
+        label="用户",
+        widget=forms.TextInput,
+        required=True
+    )
+    password = forms.CharField(
+        label="密码",
+        widget=forms.PasswordInput,
+        required=True
+    )
+    code = forms.CharField(
+        label="验证码",
+        widget=forms.TextInput,
+        required=True
+    )
