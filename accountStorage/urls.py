@@ -6,8 +6,8 @@ app_name = 'accountStorage'
 urlpatterns = [
     # 登录
     path('login/', views.login, name='login'),
-    path('logout/', view.logout，name='logout'),
-    path('image/code/', view.image_code, name='image_code'),
+    path('logout/', views.logout, name='logout'),
+    path('image/code/', views.image_code, name='image_code'),
     # 账号密码列表
     path('', views.account_list, name='account_list'),
     path('add/', views.account_add),

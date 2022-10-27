@@ -1,7 +1,12 @@
 from django import forms
 from .models import AccountPassword
+from django.conf import settings
+import hashlib
 
-
+def md5(data_string):
+    obj = hashlib.md5(settings.SECRET_KEY.encode("utf-8"))
+    obj.update(data_string.encode("utf-8"))
+    return obj.hexdigest()
 
 class Bootstrap():
     # password = forms.CharField(min_length=6, label="密码")
@@ -42,3 +47,7 @@ class LoginForm(BootstrapForm):
         widget=forms.TextInput,
         required=True
     )
+
+    def clean_password(self):
+        pwd = self.cleaned_data.get("password")
+        return md5(pwd)
