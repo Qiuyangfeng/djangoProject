@@ -27,6 +27,7 @@ class BootstrapForm(Bootstrap, forms.Form):
 #######  modelform  #################
 
 class UserModelForm(BootstrapModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
     class Meta:
         model = AccountPassword
         fields = ["name", "username", "password", "note"]
