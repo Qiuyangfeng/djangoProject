@@ -1,12 +1,22 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
+import os
+
+
 # import os, uuid
 
 class AdminUser(models.Model):
     """登录系统的账号密码"""
     username = models.CharField(verbose_name="用户名", max_length=32)
-    password = models.CharField(verbose_name="密码", max_length=64)
-    def __str__ (self):
+    password = models.CharField(verbose_name="密码", max_length=128)
+    name = models.CharField(verbose_name="名称", max_length=32, null=True)
+
+    def __str__(self):
         return self.username
+    """重新配置password字段，使用pbkdf2加密算法保存"""
+    def save(self, *args, **kwargs):
+        self.password = make_password(self.password, None, 'pbkdf2_sha256')
+        super(AdminUser, self).save(*args, **kwargs)
 
 class AccountPassword(models.Model):
     """账号密码表"""

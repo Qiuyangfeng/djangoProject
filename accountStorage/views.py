@@ -154,6 +154,7 @@ def account_detail (request):
     return JsonResponse(result)
 
 
+
 @csrf_exempt
 def account_edit (request):
     """账号编辑"""
@@ -167,7 +168,7 @@ def account_edit (request):
         return JsonResponse({"status": True})
     return JsonResponse({"status": False, 'error': form.errors})
 
-
+@csrf_exempt
 def account_delete (request):
     """账号删除"""
     uid = request.GET.get('uid')
@@ -177,7 +178,7 @@ def account_delete (request):
     AccountPassword.objects.filter(id=uid).delete()
     return JsonResponse({"status": True, 'msg': "删除成功"})
 
-
+@csrf_exempt
 def upload_excel (request):
     """上传excel，读取数据写入数据库"""
     if request.method == 'POST':

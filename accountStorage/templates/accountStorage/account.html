@@ -267,7 +267,7 @@
             $("#btnConfirmDelete").click(function () {
                 //点击确定删除按钮，发送ajax请求删除数据
                 $.ajax({
-                    url: "/account/delete/",
+                    url: "{% url 'accountStorage:account_delete' %}",
                     type: "get",
                     data: {
                         uid: DELETE_ID
@@ -302,6 +302,7 @@
             const form_data = new FormData();
             form_data.append('files', $('#file_uploads')[0].files[0]);
             $.ajax({
+                url: "{% url 'accountStorage:upload_ajax_excel' %}",
                 type: 'post',
                 contentType: false,
                 processData: false,
@@ -311,26 +312,6 @@
                     location.reload();
                 }
             })
-        }
-
-        function selectText(element) {
-            return element.innerText;
-        }
-
-        function copyText(text) {
-            const textareaC = document.createElement('textarea');
-            textareaC.setAttribute('readonly', 'readonly'); //设置只读属性防止手机上弹出软键盘
-            textareaC.value = text;
-            document.body.appendChild(textareaC); //将textarea添加为body子元素
-            textareaC.select();
-            const res = document.execCommand('copy');
-            document.body.removeChild(textareaC);//移除DOM元素
-            console.log("复制成功");
-            return res;
-        }
-
-        function myFun(e) {
-            copyText(selectText(e));
         }
 
         /**

@@ -13,7 +13,7 @@ urlpatterns = [
     path('add/', views.account_add),
     path('detail/', views.account_detail),
     path('edit/', views.account_edit),
-    path('delete/', views.account_delete),
+    path('delete/', views.account_delete, name='account_delete'),
     # 模板上传
     path('ajax/', views.upload_ajax_excel, name='upload_ajax_excel'),
 ]
