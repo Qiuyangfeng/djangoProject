@@ -1,5 +1,7 @@
 from django import forms
 from .models import AccountPassword
+#from django.contrib.auth.hashers import make_password
+
 from django.conf import settings
 import hashlib
 
@@ -7,6 +9,9 @@ def md5(data_string):
     obj = hashlib.md5(settings.SECRET_KEY.encode("utf-8"))
     obj.update(data_string.encode("utf-8"))
     return obj.hexdigest()
+
+def pbkdf2(data_string):
+    return make_password(data_string, None, 'pbkdf2_sha256')
 
 class Bootstrap():
     # password = forms.CharField(min_length=6, label="密码")
@@ -52,3 +57,4 @@ class LoginForm(BootstrapForm):
     def clean_password(self):
         pwd = self.cleaned_data.get("password")
         return md5(pwd)
+        #return pbkdf2(pwd)

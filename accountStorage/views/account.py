@@ -1,101 +1,11 @@
 import pandas as pd
-import random
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.shortcuts import render, redirect,HttpResponse
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from io import BytesIO
-from .forms import UserModelForm, LoginForm
-from .models import AccountPassword,AdminUser
+from accountStorage.forms import UserModelForm
+from accountStorage.models import AccountPassword
 
-def login(request):
-    if request.method == "GET":
-        form = LoginForm()
-        return render(request, 'accountStorage/login.html', {"form": form})
-    form = LoginForm(data=request.POST)
-    if form.is_valid():
-        print(form.cleaned_data)
-        #去数据库校验账号密码
-        user_input_code = form.cleaned_data.pop('code')
-        image_code = request.session.get('image_code', "")
-        if image_code.upper() != user_input_code.upper():
-            form.add_error("code", "验证码错误")
-            return render(request, 'accountStorage/login.html', {"form": form})
-        admin_project = AdminUser.objects.filter(**form.cleaned_data).first()
-        if not admin_project:
-            form.add_error("password", "用户名或密码错误")
-            return render(request, 'accountStorage/login.html', {"form": form})
-        # 用户名密码正确 网站生成随机字符串 存到用户cookie中，写入session中
-        request.session["info"] = {'id': admin_project.id, 'username': admin_project.username}
-        request.session.set_expiry(60 * 60 * 24 * 7)
-        return redirect("/account/")
-    return render(request, 'accountStorage/login.html')
-def logout(request):
-    """注销"""
-    request.session.clear()
-    return redirect("/account/login/")
-
-def check_code (width=120, height=30, char_length=5, font_file='Monaco.ttf', font_size=28):
-    code = []
-    img = Image.new(mode='RGB', size=(width, height), color=(255, 255, 255))
-    draw = ImageDraw.Draw(img, mode='RGB')
-
-    def rndChar ():
-        """
-        生成随机字母
-        :return:
-        """
-        return chr(random.randint(65, 90))
-
-    def rndColor ():
-        """
-        生成随机颜色
-        :return:
-        """
-        return (random.randint(0, 255), random.randint(10, 255), random.randint(64, 255))
-
-    # 写文字
-    font = ImageFont.truetype(font_file, font_size)
-    for i in range(char_length):
-        char = rndChar()
-        code.append(char)
-        h = random.randint(0, 4)
-        draw.text([i * width / char_length, h], char, font=font, fill=rndColor())
-
-    # 写干扰点
-    for i in range(40):
-        draw.point([random.randint(0, width), random.randint(0, height)], fill=rndColor())
-
-    # 写干扰圆圈
-    for i in range(40):
-        draw.point([random.randint(0, width), random.randint(0, height)], fill=rndColor())
-        x = random.randint(0, width)
-        y = random.randint(0, height)
-        draw.arc((x, y, x + 4, y + 4), 0, 90, fill=rndColor())
-
-    # 画干扰线
-    for i in range(5):
-        x1 = random.randint(0, width)
-        y1 = random.randint(0, height)
-        x2 = random.randint(0, width)
-        y2 = random.randint(0, height)
-
-        draw.line((x1, y1, x2, y2), fill=rndColor())
-
-    img = img.filter(ImageFilter.EDGE_ENHANCE_MORE)
-    return img, ''.join(code)
-
-def image_code(request):
-    """生成图片验证码"""
-    # 调用pillow函数 生产图片
-    img, code_string = check_code()
-    # 写入到自己的session中,60秒过期
-    request.session['image_code'] = code_string
-    request.session.set_expiry(60)
-    stream = BytesIO()
-    img.save(stream, 'png')
-    return HttpResponse(stream.getvalue())
 
 def account_list (request):
     """用户列表"""
@@ -130,7 +40,6 @@ def account_list (request):
     }
     return render(request, 'accountStorage/account.html', context)
 
-
 @csrf_exempt
 def account_add (request):
     """添加用户 (ajax请求)"""
@@ -143,7 +52,6 @@ def account_add (request):
         return JsonResponse({'status': True})
     return JsonResponse({'status': False, 'error': form.errors})
 
-
 def account_detail (request):
     """获取账号详情"""
     uid = request.GET.get("uid")
@@ -152,8 +60,6 @@ def account_detail (request):
         return JsonResponse({"status": False, 'error': "数据不存在"})
     result = {"status": True, 'data': row_dict}
     return JsonResponse(result)
-
-
 
 @csrf_exempt
 def account_edit (request):
@@ -194,7 +100,6 @@ def upload_excel (request):
             AccountPassword.objects.create(**df_dict)
         return redirect("/account/")
     return render(request, 'accountStorage/upload_excel.html')
-
 
 @csrf_exempt
 def upload_ajax_excel (request):
