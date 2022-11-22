@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password
-import os
+# from django.contrib.auth.hashers import make_password
+from .untils.hash import md5
+import os, uuid
 
 
 # import os, uuid
@@ -13,14 +14,18 @@ class AdminUser(models.Model):
 
     def __str__(self):
         return self.username
-    """重新配置password字段，使用pbkdf2加密算法保存"""
+
+    """重新配置password字段，使用md5或者pbkdf2加密算法保存"""
+
     def save(self, *args, **kwargs):
-        self.password = make_password(self.password, None, 'pbkdf2_sha256')
+        self.password = md5(self.password)
+        # self.password = make_password(self.password, None, 'pbkdf2_sha256')
         super(AdminUser, self).save(*args, **kwargs)
+
 
 class AccountPassword(models.Model):
     """账号密码表"""
-    name = models.CharField(verbose_name="名称", max_length=32)
+    name = models.CharField(verbose_name="名称", max_length=32, primary_key=False)
     username = models.CharField(verbose_name="用户名", max_length=32)
     password = models.CharField(verbose_name="密码", max_length=128)
     note = models.CharField(verbose_name="备注", max_length=128, blank=True, null=True)
@@ -31,7 +36,7 @@ class AccountPassword(models.Model):
 
 class ServerInfo(models.Model):
     """主机信息表"""
-    hostname = models.CharField(verbose_name="主机名", max_length=32)
+    hostname = models.CharField(verbose_name="主机名", max_length=32, primary_key=True)
     ipaddress = models.GenericIPAddressField(verbose_name="IP地址")
     platform_choices = (
         (1, "Liunx"),
@@ -49,7 +54,7 @@ class ServerInfo(models.Model):
     )
     protocols = models.PositiveSmallIntegerField(verbose_name="协议", choices=protocol_choices, default=1)
     port = models.PositiveIntegerField(verbose_name="端口")
-    note = models.CharField(verbose_name="备注", max_length=128)
+    note = models.CharField(verbose_name="备注", max_length=128, blank=True, null=True)
 
 
 def user_directory_path(instance, filename):

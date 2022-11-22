@@ -1,6 +1,6 @@
-from accountStorage.check_code import check_code
+from accountStorage.untils.check_code import check_code
 from io import BytesIO
-from accountStorage.forms import LoginForm
+from accountStorage.untils.forms import LoginForm
 from accountStorage.models import AdminUser
 from django.shortcuts import render, redirect, HttpResponse
 

@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from accountStorage.forms import UserModelForm
+from accountStorage.untils.forms import UserModelForm
 from accountStorage.models import AccountPassword
 
 
@@ -13,7 +13,7 @@ def account_list (request):
     #     account = {
     #         "name": "测试账号{}".format(i),
     #         "username": "test{}".format(i),
-    #         "password": "123456".format(i),
+    #         "password": "password{}".format(i),
     #         "note": "测试备注{}".format(i)
     #     }
     #     AccountPassword.objects.create(**account)
@@ -23,7 +23,7 @@ def account_list (request):
     if search_data:
         data["username__contains"] = search_data
     form = UserModelForm()
-    data_list = AccountPassword.objects.filter(**data).order_by("-id")
+    data_list = AccountPassword.objects.filter(**data).order_by("id")
     paginator = Paginator(data_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -99,7 +99,7 @@ def upload_excel (request):
             print(df_dict)
             AccountPassword.objects.create(**df_dict)
         return redirect("/account/")
-    return render(request, 'accountStorage/upload_excel.html')
+    return JsonResponse({'status': False, 'error': 'excel异常'})
 
 @csrf_exempt
 def upload_ajax_excel (request):
@@ -113,4 +113,4 @@ def upload_ajax_excel (request):
             print(df_dict)
             AccountPassword.objects.create(**df_dict)
         return redirect("/account/")
-    return render(request, 'accountStorage/ajax_upload.html')
+    return JsonResponse({'status': False, 'error': 'excel异常'})
