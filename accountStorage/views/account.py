@@ -28,7 +28,8 @@ def account_list (request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     keys = AccountPassword._meta.fields
-    keys_list = [keys[i].name for i in range(len(keys))]
+    keys_list = [keys[i].verbose_name for i in range(len(keys))]
+    #keys_list = [keys[i].name for i in range(len(keys))]
     context = {
         "title": "账号列表",
         "search_data": search_data,

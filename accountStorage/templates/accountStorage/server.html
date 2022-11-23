@@ -19,10 +19,12 @@
             <thead>
             <tr>
                 {% for key in key_list %}
-                    {% if key != 'id' %}
+                    {% if key != '账户凭证' %}
                         <th>{{ key }}</th>
                     {% endif %}
                 {% endfor %}
+                <th>账号</th>
+                <th>密码</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -35,6 +37,13 @@
                     <td>{{ data.get_protocols_display }}</td>
                     <td>{{ data.port }}</td>
                     <td>{{ data.note|default_if_none:"" }}</td>
+                    <!--<td>{{ data.credentials.name }}</td>-->
+                    <td>{{ data.credentials.username|default_if_none:"" }}</td>
+                    <td>
+                        <button class="btn btn-info btn-xs" onclick="copyToClip('{{ data.credentials.password }}')">
+                            Copy
+                        </button>
+                    </td>
                     <td>
                         <a class="btn btn-primary btn-xs btn-edit" onclick="editServer('{{ data.hostname }}')">编辑</a>
                         <a class="btn btn-danger btn-xs btn-delete" onclick="DeleteServer('{{ data.hostname }}')">删除</a>
@@ -54,7 +63,7 @@
                     <h4 class="modal-title" id="modalAddEditLabel">title</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="formAddEdit" novalidate>
+                    <form id="formAddEdit" novalidate class="form-horizontal">
                         <div class="clearfix">
                             {% for i in form %}
                                 <div class="col-xs-12">
@@ -237,29 +246,29 @@
         }
 
         function ConfirmDeleteServer() {
-                //点击确定删除按钮，发送ajax请求删除数据
-                console.log('确定删除' + HOSTNAME);
-                $.ajax({
-                    url: "{% url 'accountStorage:server_delete' %}",
-                    type: "get",
-                    data: {
-                        hostname: HOSTNAME
-                    },
-                    dataType: "JSON",
-                    success: function (res) {
-                        if (res.status) {
-                            //删除成功信息
-                            console.log(HOSTNAME + ' 删除成功');
-                            HOSTNAME = undefined
-                            //刷新页面
-                            location.reload()
+            //点击确定删除按钮，发送ajax请求删除数据
+            console.log('确定删除' + HOSTNAME);
+            $.ajax({
+                url: "{% url 'accountStorage:server_delete' %}",
+                type: "get",
+                data: {
+                    hostname: HOSTNAME
+                },
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        //删除成功信息
+                        console.log(HOSTNAME + ' 删除成功');
+                        HOSTNAME = undefined
+                        //刷新页面
+                        location.reload()
 
-                        } else {
-                            //删除失败
-                            alert(res.error)
-                        }
+                    } else {
+                        //删除失败
+                        alert(res.error)
                     }
-                });
+                }
+            });
         }
 
         function UploadEvent() {
@@ -282,6 +291,22 @@
                     location.reload();
                 }
             })
+        }
+
+        function copyToClip(content, message) {
+            //点击复制
+            var aux = document.createElement("input");
+            aux.setAttribute("value", content);
+            document.body.appendChild(aux);
+            aux.select();
+            document.execCommand("copy");
+            document.body.removeChild(aux);
+            if (message == null) {
+                console.log("复制成功");
+                //alert("复制成功");
+            } else {
+                alert(message);
+            }
         }
 
 

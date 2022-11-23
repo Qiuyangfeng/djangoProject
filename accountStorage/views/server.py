@@ -8,13 +8,13 @@ import pandas as pd
 
 def server_list(request):
     """服务器列表"""
-    # for i in range(20):
+    # for i in range(10):
     #     server = {
     #         "hostname": "测试服务器{}".format(i),
     #         "ipaddress": "172.16.1.{}".format(i),
-    #         "platform": "1",
-    #         "protocols": "1",
-    #         "port": "22",
+    #         "platform": "Linux",
+    #         "protocols": "rdp",
+    #         "port": "3389",
     #         "note": "测试备注{}".format(i)
     #     }
     #     ServerInfo.objects.create(**server)
@@ -29,7 +29,8 @@ def server_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     keys = ServerInfo._meta.fields
-    keys_list = [keys[i].name for i in range(len(keys))]
+    keys_list = [keys[i].verbose_name for i in range(len(keys))]
+    #keys_list = [keys[i].name for i in range(len(keys))]
     context = {
         "title": "服务器列表",
         "search_data": search_data,
@@ -46,10 +47,9 @@ def server_list(request):
 def server_add(request):
     """添加服务器(ajax请求)"""
     form = ServerModelForm(data=request.POST)
+    print(request.POST)
+    #print(form)
     if form.is_valid():
-        # 随机生成订单号
-        # form.instance.oid = datetime.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1000, 9999))
-        # form.instance.admin_id = request.session['info']['id']
         form.save()
         return JsonResponse({'status': True})
     return JsonResponse({'status': False, 'error': form.errors})

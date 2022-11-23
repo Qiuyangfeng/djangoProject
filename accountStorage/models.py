@@ -39,21 +39,23 @@ class ServerInfo(models.Model):
     hostname = models.CharField(verbose_name="主机名", max_length=32, primary_key=True)
     ipaddress = models.GenericIPAddressField(verbose_name="IP地址")
     platform_choices = (
-        (1, "Liunx"),
-        (2, "Windows"),
-        (3, "MacOS"),
-        (4, "Unix"),
-        (5, "Other"),
+        ("Liunx", "Liunx"),
+        ("Windows", "Windows"),
+        ("MacOS", "MacOS"),
+        ("Unix", "Unix"),
+        ("Other", "Other"),
     )
-    platform = models.PositiveSmallIntegerField(verbose_name="平台", choices=platform_choices, default=1)
+    platform = models.CharField(verbose_name="平台", max_length=32, choices=platform_choices, default="Linux")
     protocol_choices = (
-        (1, "ssh"),
-        (2, "rdp"),
-        (3, "telnet"),
-        (4, "vnc"),
+        ("ssh", "ssh"),
+        ("rdp", "rdp"),
+        ("telnet", "telnet"),
+        ("vnc", "vnc"),
     )
-    protocols = models.PositiveSmallIntegerField(verbose_name="协议", choices=protocol_choices, default=1)
+    protocols = models.CharField(verbose_name="协议", max_length=32, choices=protocol_choices, default="ssh")
     port = models.PositiveIntegerField(verbose_name="端口")
+    credentials = models.ForeignKey(verbose_name="账户凭证", to=AccountPassword, on_delete=models.SET_NULL, blank=True,
+                                    null=True)
     note = models.CharField(verbose_name="备注", max_length=128, blank=True, null=True)
 
 
