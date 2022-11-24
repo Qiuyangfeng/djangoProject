@@ -5,9 +5,11 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from accountStorage.untils.forms import UserModelForm
 from accountStorage.models import AccountPassword
+from accountStorage.untils.auth import login_check
 
 
-def account_list (request):
+@login_check
+def account_list(request):
     """用户列表"""
     # for i in range(20):
     #     account = {
@@ -29,7 +31,7 @@ def account_list (request):
     page_obj = paginator.get_page(page_number)
     keys = AccountPassword._meta.fields
     keys_list = [keys[i].verbose_name for i in range(len(keys))]
-    #keys_list = [keys[i].name for i in range(len(keys))]
+    # keys_list = [keys[i].name for i in range(len(keys))]
     context = {
         "title": "账号列表",
         "search_data": search_data,
@@ -41,8 +43,10 @@ def account_list (request):
     }
     return render(request, 'accountStorage/account.html', context)
 
+
+@login_check
 @csrf_exempt
-def account_add (request):
+def account_add(request):
     """添加用户 (ajax请求)"""
     form = UserModelForm(data=request.POST)
     if form.is_valid():
@@ -53,7 +57,9 @@ def account_add (request):
         return JsonResponse({'status': True})
     return JsonResponse({'status': False, 'error': form.errors})
 
-def account_detail (request):
+
+@login_check
+def account_detail(request):
     """获取账号详情"""
     uid = request.GET.get("uid")
     row_dict = AccountPassword.objects.filter(id=uid).values("name", "username", "password", "note").first()
@@ -62,8 +68,10 @@ def account_detail (request):
     result = {"status": True, 'data': row_dict}
     return JsonResponse(result)
 
+
+@login_check
 @csrf_exempt
-def account_edit (request):
+def account_edit(request):
     """账号编辑"""
     uid = request.GET.get("uid")
     row_object = AccountPassword.objects.filter(id=uid).first()
@@ -75,8 +83,10 @@ def account_edit (request):
         return JsonResponse({"status": True})
     return JsonResponse({"status": False, 'error': form.errors})
 
+
+@login_check
 @csrf_exempt
-def account_delete (request):
+def account_delete(request):
     """账号删除"""
     uid = request.GET.get('uid')
     exists = AccountPassword.objects.filter(id=uid).exists()
@@ -85,25 +95,10 @@ def account_delete (request):
     AccountPassword.objects.filter(id=uid).delete()
     return JsonResponse({"status": True, 'msg': "删除成功"})
 
-@csrf_exempt
-def upload_excel (request):
-    """上传excel，读取数据写入数据库"""
-    if request.method == 'POST':
-        raw_file = request.FILES.get('file')
-        print(raw_file)
-        df = pd.read_excel(raw_file)
-        print(df)
-        df.fillna("", inplace=True)
-        print(df.index.name)
-        for i in df.index.values:
-            df_dict = df.loc[i, ["name", "username", "password", "note"]].to_dict()
-            print(df_dict)
-            AccountPassword.objects.create(**df_dict)
-        return redirect("/account/")
-    return JsonResponse({'status': False, 'error': 'excel异常'})
 
+@login_check
 @csrf_exempt
-def upload_ajax_excel (request):
+def upload_ajax_excel(request):
     """ajax上传excel，读取数据写入数据库"""
     if request.method == 'POST':
         file_object = request.FILES.get('files')
@@ -113,5 +108,5 @@ def upload_ajax_excel (request):
             df_dict = df.loc[i, ["name", "username", "password", "note"]].to_dict()
             print(df_dict)
             AccountPassword.objects.create(**df_dict)
-        return redirect("/account/")
+        return redirect("accountStorage:account_list")
     return JsonResponse({'status': False, 'error': 'excel异常'})

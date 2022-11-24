@@ -5,7 +5,7 @@
     <div style="float: right;width: 300px">
         <form method="get">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="搜索" name="search" value="{{ search_data }}"/>
+                <input type="text" class="form-control" placeholder="搜 主机名" name="search" value="{{ search_data }}"/>
                 <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -38,11 +38,19 @@
                     <td>{{ data.port }}</td>
                     <td>{{ data.note|default_if_none:"" }}</td>
                     <!--<td>{{ data.credentials.name }}</td>-->
-                    <td>{{ data.credentials.username|default_if_none:"" }}</td>
                     <td>
-                        <button class="btn btn-info btn-xs" onclick="copyToClip('{{ data.credentials.password }}')">
-                            Copy
-                        </button>
+                        {% if data.credentials.username %}
+                            {{ data.credentials.username }}
+                        {% else %}
+                            <span class="label label-warning">未配置</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if data.credentials.password %}
+                            <button class="btn btn-info btn-xs" onclick="copyToClip('{{ data.credentials.password }}')">
+                                Copy
+                            </button>
+                        {% endif %}
                     </td>
                     <td>
                         <a class="btn btn-primary btn-xs btn-edit" onclick="editServer('{{ data.hostname }}')">编辑</a>

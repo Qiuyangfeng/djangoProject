@@ -9,7 +9,7 @@ urlpatterns = [
     path('logout/', login.logout, name='logout'),
     path('image/code/', login.image_code, name='image_code'),
     # 账号密码列表
-    path('', account.account_list, name='account_list'),
+    path('list/', account.account_list, name='account_list'),
     path('add/', account.account_add, name='account_add'),
     path('detail/', account.account_detail, name='account_detail'),
     path('edit/', account.account_edit, name='account_edit'),

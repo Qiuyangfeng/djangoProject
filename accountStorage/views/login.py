@@ -7,11 +7,13 @@ from django.shortcuts import render, redirect, HttpResponse
 
 def login(request):
     if request.method == "GET":
+        if request.session.get('info'):
+            return redirect("accountStorage:account_list")
         form = LoginForm()
         return render(request, 'accountStorage/login.html', {"form": form})
     form = LoginForm(data=request.POST)
     if form.is_valid():
-        print(form.cleaned_data)
+        # print(form.cleaned_data)
         # 去数据库校验账号密码
         user_input_code = form.cleaned_data.pop('code')
         image_code = request.session.get('image_code', "")
@@ -25,14 +27,14 @@ def login(request):
         # 用户名密码正确 网站生成随机字符串 存到用户cookie中，写入session中
         request.session["info"] = {'id': admin_project.id, 'username': admin_project.username}
         request.session.set_expiry(60 * 60 * 24 * 7)
-        return redirect("/account/")
-    return render(request, 'accountStorage/login.html')
+        return redirect("accountStorage:account_list")
+    return render(request, 'accountStorage/login.html', {"form": form})
 
 
 def logout(request):
     """注销"""
-    request.session.clear()
-    return redirect("/account/login/")
+    request.session.flush()
+    return redirect("accountStorage:login")
 
 
 def image_code(request):
@@ -45,3 +47,6 @@ def image_code(request):
     stream = BytesIO()
     img.save(stream, 'png')
     return HttpResponse(stream.getvalue())
+
+def register(request):
+    return HttpResponse("ok")

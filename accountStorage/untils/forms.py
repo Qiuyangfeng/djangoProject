@@ -50,6 +50,11 @@ class LoginForm(BootstrapForm):
         widget=forms.PasswordInput,
         required=True
     )
+    confirm_password = forms.CharField(
+        label="重复密码",
+        widget=forms.PasswordInput,
+        required=True
+    )
     code = forms.CharField(
         label="验证码",
         widget=forms.TextInput,
