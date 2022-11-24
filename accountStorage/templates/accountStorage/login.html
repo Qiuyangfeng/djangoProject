@@ -30,8 +30,7 @@
         {% csrf_token %}
         {% for i in form %}
             <div class="form-group">
-                {% if i.name == 'confirm_password' %}
-                {% elif i.name == 'code' %}
+                {% if i.name == 'code' %}
                     <label for="id_code">{{ i.label }}:</label>
                     <div class="row">
                         <div class="col-xs-7">
@@ -51,7 +50,7 @@
         {% endfor %}
 
         <input type="submit" value="登录" class="btn btn-primary"/>
-        <input type="button" value="注册" class="btn btn-primary" onclick="register()"/>
+        <input type="button" value="注册" class="btn btn-primary" onclick="Register()"/>
         <span style="color: red;">{{ error_msg }}</span>
     </form>
 </div>
@@ -65,17 +64,13 @@
                 <h4 class="modal-title" id="modalAddEditLabel">title</h4>
             </div>
             <div class="modal-body">
-                <form id="formAddEdit" novalidate class="form-horizontal">
+                <form id="formRegister" novalidate class="form-horizontal">
                     <div class="clearfix">
-                        {% for i in form %}
+                        {% for i in register %}
 
                             <div class="col-xs-12">
                                 <div class="form-group" style="position: relative;margin-bottom: 20px">
-                                    {% if i.label != '验证码' %}
-                                        <label>{{ i.label }}</label>
-                                    {% else %}
-                                        <label>重复密码</label>
-                                    {% endif %}
+                                    <label>{{ i.label }}</label>
                                     {{ i }}
                                     <span class="error-msg" style="color: red;position: absolute"></span>
                                 </div>
@@ -87,7 +82,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="BtnSaveEvent()">保存</button>
+                <button type="button" class="btn btn-primary" onclick="RegisterAdmin()">保存</button>
             </div>
         </div>
     </div>
@@ -96,16 +91,39 @@
 <script src="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/js/bootstrap.js' %}"></script>
 <script src="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/js/WdatePicker.js' %}"></script>
 <script type="text/javascript">
-    function register() {
+    function Register() {
         // 弹出注册用户窗口
         // 清空对话框内容
-        $("#formAddEdit")[0].reset();
+        $("#formRegister")[0].reset();
         // 修改对话框标题
         $("#modalAddEditLabel").text("注册用户");
         // 显示新建账号模态框
         $('#modalAddEdit').modal('show');
         //清空可能残留的错误
         $(".error-msg").empty();
+    }
+
+    function RegisterAdmin() {
+        //点击保存按钮，发生请求
+        $.ajax({
+            url: "{% url 'accountStorage:register' %}",
+            type: "post",
+            data: $("#formRegister").serialize(),
+            dataType: 'JSON',
+            success: function (res) {
+                if (res.status) {
+                    console.log('注册成功');
+                    alert('注册成功,请登录')
+                    //刷新页面
+                    location.reload();
+                } else {
+                    // 把错误信息显示在对话框中
+                    $.each(res.error, function (name, errorList) {
+                        $("#id_" + name).next().text(errorList[0]);
+                    })
+                }
+            }
+        })
     }
 </script>
 </body>

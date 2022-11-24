@@ -8,6 +8,8 @@ urlpatterns = [
     path('login/', login.login, name='login'),
     path('logout/', login.logout, name='logout'),
     path('image/code/', login.image_code, name='image_code'),
+    # 注册
+    path('register/', login.register, name='register'),
     # 账号密码列表
     path('list/', account.account_list, name='account_list'),
     path('add/', account.account_add, name='account_add'),
