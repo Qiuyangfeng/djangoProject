@@ -91,8 +91,7 @@ def server_edit(request):
 def server_delete(request):
     """服务器删除"""
     hostname = request.GET.get('hostname')
-    exists = ServerInfo.objects.filter(hostname=hostname).exists()
-    if not exists:
+    if not ServerInfo.objects.filter(hostname=hostname).exists():
         return JsonResponse({"status": False, 'error': "删除失败，数据不存在"})
     ServerInfo.objects.filter(hostname=hostname).delete()
     return JsonResponse({"status": True, 'msg': "删除成功"})

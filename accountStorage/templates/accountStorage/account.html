@@ -1,11 +1,14 @@
 {% extends 'accountStorage/layout.html' %}
 {% block content %}
-    <button id="btnAdd" type="button" class="btn btn-success">新建账号</button>
+    <button type="button" class="btn btn-success" onclick="BtnAddEvent()">新建账号</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">模板上传</button>
+    <!-- 搜索框 -->
     <div style="float: right;width: 300px">
         <form method="get">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="搜 名称" name="search" value="{{ search_data }}"/>
+                <label>
+                    <input type="text" class="form-control" placeholder="搜 名称" name="search" value="{{ search_data }}"/>
+                </label>
                 <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -14,6 +17,7 @@
             </div>
         </form>
     </div>
+    <!-- 显示账号表的界面 -->
     <div class="bs-example" data-example-id="hoverable-table">
         <table class="table table-hover">
             <thead>
@@ -41,8 +45,8 @@
                     </td>
                     <td>{{ data.note|default_if_none:"" }}</td>
                     <td>
-                        <a uid="{{ data.id }}" class="btn btn-primary btn-xs btn-edit">编辑</a>
-                        <a uid="{{ data.id }}" class="btn btn-danger btn-xs btn-delete">删除</a>
+                        <a class="btn btn-primary btn-xs btn-edit" onclick="BtnEditEvent({{ data.id }})">编辑</a>
+                        <a class="btn btn-danger btn-xs btn-delete" onclick="BtnDeleteEvent({{ data.id }})">删除</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -75,7 +79,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button id="btnSave" type="button" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-primary" onclick="BtnSaveEvent()">保存</button>
                 </div>
             </div>
         </div>
@@ -87,7 +91,7 @@
                 <h4>是否删除该账号？</h4>
                 <p>删除后，相关账号将会消失！</p>
                 <p style="text-align: right;">
-                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">确定</button>
+                    <button type="button" class="btn btn-danger" onclick="ConfirmDeleteEvent()">确定</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </p>
             </div>
@@ -106,11 +110,9 @@
             </div>
         </div>
     </div>
+    <!-- 分页 -->
     <div class="pagination">
     <span class="step-links">
-    <nav aria-label="Page navigation">
-    <ul class="pagination">
-    <li>
         {% if page_obj.has_previous %}
             <a href="?page=1&search={{ search_data }}">&laquo; 首页</a>
             <a href="?page={{ page_obj.previous_page_number }}&search={{ search_data }}">上一页</a>
@@ -124,86 +126,71 @@
             <a href="?page={{ page_obj.next_page_number }}&search={{ search_data }}">下一页</a>
             <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_data }}">尾页 &raquo;</a>
         {% endif %}
-    </li>
-    </ul>
-    </nav>
     </span>
     </div>
 {% endblock %}
 {% block js %}
     <script type="text/javascript">
-        var DELETE_ID;
-        var EDIT_ID;
-        $(function () {
-            bindBtnAddEvent();
-            bindBtnEditEvent();
-            bindBtnSaveEvent();
-            bindBtnDeleteEvent();
-            bindBtnConfirmDeleteEvent();
-        })
+        let ACCOUNT_ID
 
-        function bindBtnAddEvent() {
-            $("#btnAdd").click(function () {
-                // 将正在编辑的ID设置为空
-                EDIT_ID = undefined;
-                //清空对话框内容
-                $("#formAddEdit")[0].reset();
-                //修改对话框标题
-                $("#modalAddEditLabel").text("新建");
-                //点击新建按钮，显示对话框
-                $('#modalAddEdit').modal('show');
-            });
+        //点击新建弹出
+        function BtnAddEvent() {
+            // 将正在编辑的ID设置为空
+            ACCOUNT_ID = undefined;
+            //清空对话框内容
+            $("#formAddEdit")[0].reset();
+            //修改对话框标题
+            $("#modalAddEditLabel").text("新建账号");
+            //点击新建按钮，显示对话框
+            $('#modalAddEdit').modal('show');
         }
 
-        function bindBtnEditEvent() {
-            $(".btn-edit").click(function () {
-                //清空对话框内容
-                $("#formAddEdit")[0].reset();
-                var uid = $(this).attr("uid");
-                EDIT_ID = uid;
-                //发送ajax去后端获取当前行的数据  /account/detail/?uid=123
-                $.ajax({
-                    url: "{% url 'accountStorage:account_detail' %}",
-                    type: "get",
-                    data: {
-                        uid: uid
-                    },
-                    dataType: "JSON",
-                    success: function (res) {
-                        if (res.status) {
-                            //将数据赋值到标签中
-                            $.each(res.data, function (name, value) {
-                                $("#id_" + name).val(value)
-                            })
-                            //修改对话框标题
-                            $("#modalAddEditLabel").text("编辑")
-                            //点击编辑按钮，显示对话框
-                            $('#modalAddEdit').modal('show');
-                        } else {
-                            alert(res.error);
-                        }
+        //点击编辑弹出
+        function BtnEditEvent(id) {
+            //清空对话框内容
+            $("#formAddEdit")[0].reset();
+            ACCOUNT_ID = id
+            //发送ajax去后端获取当前行的数据  /account/detail/?uid=123
+            $.ajax({
+                url: "{% url 'accountStorage:account_detail' %}",
+                type: "get",
+                data: {
+                    id: id
+                },
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        //将数据赋值到标签中
+                        $.each(res.data, function (name, value) {
+                            $("#id_" + name).val(value)
+                        })
+                        //修改对话框标题
+                        $("#modalAddEditLabel").text("编辑")
+                        //点击编辑按钮，显示对话框
+                        $('#modalAddEdit').modal('show');
+                    } else {
+                        alert(res.error);
                     }
+                }
 
-                })
             })
         }
 
-        function bindBtnSaveEvent() {
-            $("#btnSave").click(function () {
-                //清除错误信息
-                $(".error-msg").empty();
-                if (EDIT_ID) {
-                    //编辑
-                    doEdit();
-                } else {
-                    //添加
-                    doAdd();
-                }
-            });
+        //点击保存，根据ACCOUNT_ID来执行脚本
+        function BtnSaveEvent() {
+            //清除错误信息
+            $(".error-msg").empty();
+            if (ACCOUNT_ID) {
+                //编辑
+                EditAccount();
+            } else {
+                //添加
+                AddAccount();
+            }
         }
 
-        function doAdd() {
-            //点击保存按钮，发生请求
+        //新增用户
+        function AddAccount() {
             $.ajax({
                 url: "{% url 'accountStorage:account_add' %}",
                 type: "post",
@@ -211,12 +198,7 @@
                 dataType: 'JSON',
                 success: function (res) {
                     if (res.status) {
-                        //alert("创建成功");
-                        //清空表单 $("#formAdd")是jQuery对象 -> $("#formAdd")[0] DOM对象
-                        //$("#formAdd")[0].reset();
-                        //隐藏对话框
-                        //$('#myModal').modal('hide');
-                        //刷新页面
+                        console.log("创建成功");
                         location.reload();
                     } else {
                         // 把错误信息显示在对话框中
@@ -228,21 +210,17 @@
             })
         }
 
-        function doEdit() {
+        //编辑用户
+        function EditAccount() {
             //点击保存按钮，发生请求  /order/edit/?uid=123
             $.ajax({
-                url: "{% url 'accountStorage:account_add' %}" + "?uid=" + EDIT_ID,
+                url: "{% url 'accountStorage:account_edit' %}" + "?id=" + ACCOUNT_ID,
                 type: "post",
                 data: $("#formAddEdit").serialize(),
                 dataType: 'JSON',
                 success: function (res) {
                     if (res.status) {
-                        //alert("创建成功");
-                        //清空表单 $("#formAdd")是jQuery对象 -> $("#formAdd")[0] DOM对象
-                        //$("#formAdd")[0].reset();
-                        //隐藏对话框
-                        //$('#myModal').modal('hide');
-                        //刷新页面
+                        console.log('修改成功')
                         location.reload();
                     } else {
                         if (res.tips) {
@@ -258,53 +236,46 @@
             })
         }
 
-        function bindBtnDeleteEvent() {
-            $(".btn-delete").click(function () {
-                //点击删除按钮，显示对话框
-                $('#modalDelete').modal('show');
-                DELETE_ID = $(this).attr("uid")
-                //console.log(DELETE_ID);
-            });
+        //点击删除按钮，显示对话框
+        function BtnDeleteEvent(id) {
+
+            $('#modalDelete').modal('show');
+            ACCOUNT_ID = id
+            //console.log(ACCOUNT_ID);
         }
 
-        function bindBtnConfirmDeleteEvent() {
-            $("#btnConfirmDelete").click(function () {
-                //点击确定删除按钮，发送ajax请求删除数据
-                $.ajax({
-                    url: "{% url 'accountStorage:account_delete' %}",
-                    type: "get",
-                    data: {
-                        uid: DELETE_ID
-                    },
-                    dataType: "JSON",
-                    success: function (res) {
-                        if (res.status) {
-                            //隐藏删除框
-                            //$('#deleteModal').modal('hide');
-                            //删除当前行js
-                            //$("tr[uid='" + DELETE_ID + "']").remove()
-                            //删除成功信息
-                            //alert(res.msg);
-                            DELETE_ID = 0
-                            //刷新页面
-                            location.reload()
+        //点击确定删除按钮，发送ajax请求删除数据
+        function ConfirmDeleteEvent() {
+            $.ajax({
+                url: "{% url 'accountStorage:account_delete' %}",
+                type: "get",
+                data: {
+                    id: ACCOUNT_ID
+                },
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        //删除成功信息
+                        //alert(res.msg);
+                        ACCOUNT_ID = undefined
+                        //刷新页面
+                        location.reload()
 
-                        } else {
-                            //删除失败
-                            alert(res.error)
-                        }
+                    } else {
+                        //删除失败
+                        alert(res.error)
                     }
-                })
-            });
+                }
+            })
         }
 
+        //显示上传模态框
         function UploadEvent() {
-            //显示上传模态框
             $('#modalUpload').modal('show');
         }
 
+        //上传excel
         function uploads() {
-            //上传excel
             const form_data = new FormData();
             form_data.append('files', $('#file_uploads')[0].files[0]);
             $.ajax({
@@ -313,16 +284,16 @@
                 contentType: false,
                 processData: false,
                 data: form_data,
-                success: function (callback) {
+                success: function () {
                     alert('上传完成!')
                     location.reload();
                 }
             })
         }
 
+        //点击复制
         function copyToClip(content, message) {
-            //点击复制
-            var aux = document.createElement("input");
+            let aux = document.createElement("input");
             aux.setAttribute("value", content);
             document.body.appendChild(aux);
             aux.select();

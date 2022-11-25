@@ -12,6 +12,7 @@
     </style>
 </head>
 <body>
+<!-- 主界面 -->
 <nav class="navbar navbar-default">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -41,7 +42,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="#">个人资料</a></li>
                         <li><a href="#">我的信息</a></li>
-                        <li><a href="/account/logout/">注销</a></li>
+                        <li><a href="{% url 'accountStorage:logout' %}">注销</a></li>
                         <li role="separator" class="divider"></li>
                     </ul>
                 </li>
@@ -50,7 +51,7 @@
     </div><!-- /.container-fluid -->
 </nav>
 <div class="container">
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </div>
 <script src="{% static 'accountStorage/js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'accountStorage/plugins/bootstrap-3.4.1-dist/js/bootstrap.js' %}"></script>

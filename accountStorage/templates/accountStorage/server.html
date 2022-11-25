@@ -2,10 +2,14 @@
 {% block content %}
     <button type="button" class="btn btn-success" onclick="AddEvent()">新建服务器</button>
     <button type="button" class="btn btn-primary" data-toggle="modal" onclick="UploadEvent()">模板上传</button>
+    <!-- 搜索框 -->
     <div style="float: right;width: 300px">
         <form method="get">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="搜 主机名" name="search" value="{{ search_data }}"/>
+                <label>
+                    <input type="text" class="form-control" placeholder="搜 主机名" name="search"
+                           value="{{ search_data }}"/>
+                </label>
                 <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -14,6 +18,7 @@
             </div>
         </form>
     </div>
+    <!-- 显示服务器列表 -->
     <div class="bs-example" data-example-id="hoverable-table">
         <table class="table table-hover">
             <thead>
@@ -118,11 +123,9 @@
             </div>
         </div>
     </div>
+    <!-- 分页 -->
     <div class="pagination">
     <span class="step-links">
-    <nav aria-label="Page navigation">
-    <ul class="pagination">
-    <li>
         {% if page_obj.has_previous %}
             <a href="?page=1&search={{ search_data }}">&laquo; 首页</a>
             <a href="?page={{ page_obj.previous_page_number }}&search={{ search_data }}">上一页</a>
@@ -136,9 +139,6 @@
             <a href="?page={{ page_obj.next_page_number }}&search={{ search_data }}">下一页</a>
             <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_data }}">尾页 &raquo;</a>
         {% endif %}
-    </li>
-    </ul>
-    </nav>
     </span>
     </div>
 {% endblock %}
@@ -146,6 +146,7 @@
     <script type="text/javascript">
         let HOSTNAME;
 
+        //点击新建弹出
         function AddEvent() {
             // 将正在编辑的ID设置为空
             HOSTNAME = undefined;
@@ -159,6 +160,7 @@
             $(".error-msg").empty();
         }
 
+        //点击编辑弹出
         function editServer(content) {
             // 编辑服务器信息
             HOSTNAME = content
@@ -190,6 +192,7 @@
 
         }
 
+        //点击保存，根据HOSTNAME来执行脚本
         function BtnSaveEvent() {
             // 清除错误信息
             $(".error-msg").empty();
@@ -201,6 +204,7 @@
             }
         }
 
+        //新增服务器
         function AddServer() {
             //点击保存按钮，发生请求
             $.ajax({
@@ -222,8 +226,9 @@
             })
         }
 
+        //编辑服务器
         function EditServer() {
-            //点击保存按钮，发生请求  /order/edit/?uid=123
+            //点击保存按钮，发生请求/server/edit/?hostname=xx
             $.ajax({
                 url: "{% url 'accountStorage:server_edit' %}" + "?hostname=" + HOSTNAME,
                 type: "post",
@@ -246,15 +251,15 @@
             })
         }
 
+        //点击删除按钮，显示对话框
         function DeleteServer(content) {
-            //点击删除按钮，显示对话框
             $('#modalDelete').modal('show');
             HOSTNAME = content
             console.log('询问删除 ' + HOSTNAME);
         }
 
+        //点击确定删除按钮，发送ajax请求删除数据
         function ConfirmDeleteServer() {
-            //点击确定删除按钮，发送ajax请求删除数据
             console.log('确定删除' + HOSTNAME);
             $.ajax({
                 url: "{% url 'accountStorage:server_delete' %}",
@@ -274,18 +279,19 @@
                     } else {
                         //删除失败
                         alert(res.error)
+                        location.reload()
                     }
                 }
             });
         }
 
+        //显示上传模态框
         function UploadEvent() {
-            //显示上传模态框
             $('#modalUpload').modal('show');
         }
 
+        //上传excel
         function uploads() {
-            //上传excel
             const form_data = new FormData();
             form_data.append('files', $('#file_uploads')[0].files[0]);
             $.ajax({
@@ -294,16 +300,16 @@
                 contentType: false,
                 processData: false,
                 data: form_data,
-                success: function (callback) {
+                success: function () {
                     alert('上传完成!')
                     location.reload();
                 }
             })
         }
 
+        //点击复制
         function copyToClip(content, message) {
-            //点击复制
-            var aux = document.createElement("input");
+            let aux = document.createElement("input");
             aux.setAttribute("value", content);
             document.body.appendChild(aux);
             aux.select();

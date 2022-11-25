@@ -50,9 +50,6 @@ def account_add(request):
     """添加用户 (ajax请求)"""
     form = UserModelForm(data=request.POST)
     if form.is_valid():
-        # 随机生成订单号
-        # form.instance.oid = datetime.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1000, 9999))
-        # form.instance.admin_id = request.session['info']['id']
         form.save()
         return JsonResponse({'status': True})
     return JsonResponse({'status': False, 'error': form.errors})
@@ -61,8 +58,8 @@ def account_add(request):
 @login_check
 def account_detail(request):
     """获取账号详情"""
-    uid = request.GET.get("uid")
-    row_dict = AccountPassword.objects.filter(id=uid).values("name", "username", "password", "note").first()
+    account_id = request.GET.get("id")
+    row_dict = AccountPassword.objects.filter(id=account_id).values("name", "username", "password", "note").first()
     if not row_dict:
         return JsonResponse({"status": False, 'error': "数据不存在"})
     result = {"status": True, 'data': row_dict}
@@ -73,8 +70,8 @@ def account_detail(request):
 @csrf_exempt
 def account_edit(request):
     """账号编辑"""
-    uid = request.GET.get("uid")
-    row_object = AccountPassword.objects.filter(id=uid).first()
+    account_id = request.GET.get("id")
+    row_object = AccountPassword.objects.filter(id=account_id).first()
     if not row_object:
         return JsonResponse({"status": False, 'tips': "数据不存在"})
     form = UserModelForm(data=request.POST, instance=row_object)
@@ -88,11 +85,10 @@ def account_edit(request):
 @csrf_exempt
 def account_delete(request):
     """账号删除"""
-    uid = request.GET.get('uid')
-    exists = AccountPassword.objects.filter(id=uid).exists()
-    if not exists:
+    account_id = request.GET.get('id')
+    if not AccountPassword.objects.filter(id=account_id).exists():
         return JsonResponse({"status": False, 'error': "删除失败，数据不存在"})
-    AccountPassword.objects.filter(id=uid).delete()
+    AccountPassword.objects.filter(id=account_id).delete()
     return JsonResponse({"status": True, 'msg': "删除成功"})
 
 

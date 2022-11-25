@@ -1,5 +1,5 @@
 from django import forms
-from accountStorage.models import AccountPassword,ServerInfo
+from accountStorage.models import AccountPassword, ServerInfo
 from accountStorage.untils.hash import md5
 
 
@@ -26,7 +26,7 @@ class BootstrapForm(Bootstrap, forms.Form):
 #######  modelform  #################
 
 class UserModelForm(BootstrapModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(label="密码", widget=forms.PasswordInput)
 
     class Meta:
         model = AccountPassword
@@ -40,28 +40,17 @@ class ServerModelForm(BootstrapModelForm):
 
 
 class LoginForm(BootstrapForm):
-    username = forms.CharField(
-        label="用户",
-        widget=forms.TextInput,
-        required=True
-    )
-    password = forms.CharField(
-        label="密码",
-        widget=forms.PasswordInput,
-        required=True
-    )
-    confirm_password = forms.CharField(
-        label="重复密码",
-        widget=forms.PasswordInput,
-        required=True
-    )
-    code = forms.CharField(
-        label="验证码",
-        widget=forms.TextInput,
-        required=True
-    )
+    username = forms.CharField(label="用户名", widget=forms.TextInput, required=True)
+    password = forms.CharField(label="密码", widget=forms.PasswordInput, required=True)
+    code = forms.CharField(label="验证码", widget=forms.TextInput, required=True)
 
     def clean_password(self):
         pwd = self.cleaned_data.get("password")
         return md5(pwd)
         # return pbkdf2(pwd)
+
+
+class RegisterFrom(BootstrapForm):
+    register_username = forms.CharField(label="用户名", widget=forms.TextInput, required=True)
+    register_password = forms.CharField(label="密码", widget=forms.PasswordInput, required=True)
+    confirm_password = forms.CharField(label="重复密码", widget=forms.PasswordInput, required=True)

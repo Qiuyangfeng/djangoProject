@@ -1,26 +1,32 @@
 from accountStorage.untils.check_code import check_code
 from io import BytesIO
-from accountStorage.untils.forms import LoginForm
+from accountStorage.untils.forms import LoginForm, RegisterFrom
 from accountStorage.models import AdminUser
 from django.shortcuts import render, redirect, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 
 def login(request):
+    """用户登录"""
     if request.method == "GET":
         if request.session.get('info'):
             return redirect("accountStorage:account_list")
         form = LoginForm()
-        return render(request, 'accountStorage/login.html', {"form": form})
+        register_admin = RegisterFrom()
+        return render(request, 'accountStorage/login.html', {"form": form, 'register': register_admin})
     form = LoginForm(data=request.POST)
     if form.is_valid():
-        # print(form.cleaned_data)
+        print(form.cleaned_data)
         # 去数据库校验账号密码
         user_input_code = form.cleaned_data.pop('code')
-        image_code = request.session.get('image_code', "")
-        if image_code.upper() != user_input_code.upper():
+        image_show_code = request.session.get('image_code', "")
+        print(form.cleaned_data)
+        if image_show_code.upper() != user_input_code.upper():
             form.add_error("code", "验证码错误")
             return render(request, 'accountStorage/login.html', {"form": form})
         admin_project = AdminUser.objects.filter(**form.cleaned_data).first()
+        print(admin_project)
         if not admin_project:
             form.add_error("password", "用户名或密码错误")
             return render(request, 'accountStorage/login.html', {"form": form})
@@ -32,7 +38,7 @@ def login(request):
 
 
 def logout(request):
-    """注销"""
+    """用户注销"""
     request.session.flush()
     return redirect("accountStorage:login")
 
@@ -48,5 +54,21 @@ def image_code(request):
     img.save(stream, 'png')
     return HttpResponse(stream.getvalue())
 
+
+@csrf_exempt
 def register(request):
-    return HttpResponse("ok")
+    """用户注册"""
+    register_data = {}
+    form = RegisterFrom(data=request.POST)
+    if form.is_valid():
+        # print(form.cleaned_data)
+        confirm_password = form.cleaned_data.pop('confirm_password')
+        password = form.cleaned_data['register_password']
+        if confirm_password != password:
+            form.add_error("confirm_password", "密码不一致")
+            return JsonResponse({'status': False, 'error': form.errors})
+        register_data['username'] = form.cleaned_data['register_username']
+        register_data['password'] = form.cleaned_data['register_password']
+        AdminUser.objects.create(**register_data)
+        return JsonResponse({'status': True})
+    return JsonResponse({'status': False, 'error': form.errors})

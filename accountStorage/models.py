@@ -10,14 +10,14 @@ class AdminUser(models.Model):
     """登录系统的账号密码"""
     username = models.CharField(verbose_name="用户名", max_length=32)
     password = models.CharField(verbose_name="密码", max_length=128)
-    name = models.CharField(verbose_name="名称", max_length=32, null=True)
+    name = models.CharField(verbose_name="名称", max_length=32, blank=True, null=True)
 
-    def __str__(self):
+    def __str__ (self):
         return self.username
 
     """重新配置password字段，使用md5或者pbkdf2加密算法保存"""
 
-    def save(self, *args, **kwargs):
+    def save (self, *args, **kwargs):
         self.password = md5(self.password)
         # self.password = make_password(self.password, None, 'pbkdf2_sha256')
         super(AdminUser, self).save(*args, **kwargs)
@@ -30,7 +30,7 @@ class AccountPassword(models.Model):
     password = models.CharField(verbose_name="密码", max_length=128)
     note = models.CharField(verbose_name="备注", max_length=128, blank=True, null=True)
 
-    def __str__(self):
+    def __str__ (self):
         return self.username
 
 
@@ -59,7 +59,7 @@ class ServerInfo(models.Model):
     note = models.CharField(verbose_name="备注", max_length=128, blank=True, null=True)
 
 
-def user_directory_path(instance, filename):
+def user_directory_path (instance, filename):
     ext = filename.split('.')[-1]
     filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
     return os.path.join("files", filename)
