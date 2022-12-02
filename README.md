@@ -18,6 +18,7 @@ http://127.0.0.1/account/login
 默认密码：123456
 
 部署项目
+
 使用gunicorn
 
 pip install gunicorn
