@@ -19,9 +19,13 @@ http://127.0.0.1/account/login
 
 部署项目
 使用gunicorn
+
 pip install gunicorn
+
 gunicorn djangoProject.wsgi -b 0.0.0.0:8000
 
 使用uwsgi
+
 pip install uwsgi
+
 uwsgi --http :8000 --file djangoProject/wsgi.py
